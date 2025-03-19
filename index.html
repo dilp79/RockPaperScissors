@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Камень-Ножницы-Бумага: Шестиугольная Стратегия</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Камень-Ножницы-Бумага: Шестиугольная Стратегия</h1>
+            <p>Поле 10x10</p>
+            <p class="game-rules">Только ваши предметы (с зеленой подсветкой) могут инициировать удаление других
+                предметов</p>
+            <div class="score-container">
+                <p>Счёт: <span id="score">0</span></p>
+                <p class="difficulty">Сложность: <span id="difficulty">Легкая (3 предмета)</span></p>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="hexagon-grid" id="hexGrid"></div>
+
+            <div class="controls">
+                <h2>Ваш ход</h2>
+                <div class="item-selection">
+                    <div class="item" data-item="stone">
+                        <img src="stone.png" alt="Камень">
+                        <p>Камень</p>
+                    </div>
+                    <div class="item" data-item="scissors">
+                        <img src="scissors.png" alt="Ножницы">
+                        <p>Ножницы</p>
+                    </div>
+                    <div class="item" data-item="paper">
+                        <img src="paper.png" alt="Бумага">
+                        <p>Бумага</p>
+                    </div>
+                </div>
+                <div class="status" id="gameStatus">Выберите предмет и разместите его на поле</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Стартовый экран -->
+    <div class="message-overlay" id="startGameMessage">
+        <div class="message-box">
+            <h2>Добро пожаловать в игру!</h2>
+            <p>Камень-Ножницы-Бумага: Шестиугольная Стратегия</p>
+            <button id="startButton">Начать игру</button>
+        </div>
+    </div>
+
+    <!-- Экран окончания игры -->
+    <div class="message-overlay" id="endGameMessage">
+        <div class="message-box">
+            <h2>Игра окончена!</h2>
+            <p>Ваш итоговый счёт: <span id="finalScore">0</span></p>
+            <button id="restartButton">Начать заново</button>
+        </div>
+    </div>
+
+    <audio id="buttonClickSound" src="button_click.mp3"></audio>
+    <audio id="victorySound" src="victory.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
