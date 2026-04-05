@@ -29,7 +29,7 @@
   --hex-empty: #1e1250;
   --hex-fill: #160e3a;
   --hex-edge: rgba(255, 255, 255, 0.18);
-  --hex-border: rgba(255, 255, 255, 0.45);
+  --hex-border: rgba(255, 255, 255, 0.35);
   --hex-hover: #2a1a70;
 
   --particle-primary: #00ffff;
@@ -432,7 +432,7 @@ button.hex {
   width: var(--hex-w);
   height: var(--hex-h);
   position: relative;
-  margin: 0 0.5px;
+  margin: 0 1.5px;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
@@ -440,16 +440,21 @@ button.hex {
   justify-content: center;
   align-items: center;
   isolation: isolate;
-  /* Outer hex acts as the "border" color */
-  background: var(--hex-border);
-  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+  background: linear-gradient(165deg, var(--hex-empty) 0%, var(--hex-fill) 100%);
+  /* drop-shadow renders OUTSIDE clip-path — this IS the visible border */
+  filter:
+    drop-shadow(0 0 0 var(--hex-border))
+    drop-shadow(1px 0 0 var(--hex-border))
+    drop-shadow(-1px 0 0 var(--hex-border))
+    drop-shadow(0 1px 0 var(--hex-border))
+    drop-shadow(0 -1px 0 var(--hex-border));
 }
 
-/* Inner fill — inset creates visible gap = border thickness */
+/* Fill layer */
 .hex::before {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: 0;
   z-index: 0;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   background: linear-gradient(165deg, var(--hex-empty) 0%, var(--hex-fill) 100%);
@@ -457,7 +462,6 @@ button.hex {
   transition: background 0.2s ease;
 }
 
-/* No longer needed — border is created by the gap between outer bg and inner ::before */
 .hex::after {
   display: none;
 }
@@ -469,8 +473,13 @@ button.hex {
 .hex:hover {
   transform: scale(1.06);
   z-index: 10;
-  background: var(--accent);
-  filter: drop-shadow(0 0 4px var(--accent-glow));
+  filter:
+    drop-shadow(0 0 0 var(--accent))
+    drop-shadow(1px 0 0 var(--accent))
+    drop-shadow(-1px 0 0 var(--accent))
+    drop-shadow(0 1px 0 var(--accent))
+    drop-shadow(0 -1px 0 var(--accent))
+    drop-shadow(0 0 6px var(--accent-glow));
 }
 
 .hex:focus {
