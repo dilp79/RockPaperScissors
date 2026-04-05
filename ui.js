@@ -182,6 +182,9 @@
       var hex = hexGrid.querySelector('.hex[data-row="' + row + '"][data-col="' + col + '"]');
       if (!hex) return;
       hex.classList.remove('empty');
+      if (isPlayer) {
+        hex.classList.add('player-cell');
+      }
       var img = document.createElement('img');
       img.src = item + '.png';
       img.alt = I18n.t(item);
@@ -213,7 +216,7 @@
             // Only wipe if the cell wasn't re-populated during the animation
             if (hex.querySelector('img') === snapshot) {
               hex.innerHTML = '';
-              hex.classList.remove('is-clearing');
+              hex.classList.remove('is-clearing', 'player-cell');
               hex.classList.add('empty');
             } else {
               // Cell was re-populated; just remove the clearing flag
@@ -289,7 +292,7 @@
           } else if (!engineItem && hasImg) {
             // Engine says empty but DOM has content — fix it
             hex.innerHTML = '';
-            hex.classList.remove('is-clearing', 'pop-in', 'hex-ripple');
+            hex.classList.remove('is-clearing', 'pop-in', 'hex-ripple', 'player-cell');
             hex.classList.add('empty');
           }
         }
