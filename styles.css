@@ -436,14 +436,16 @@ button.hex {
   justify-content: center;
   align-items: center;
   isolation: isolate;
-  filter: drop-shadow(0 0 1px var(--hex-edge)) drop-shadow(0 0.5px 0.5px rgba(0, 0, 0, 0.6));
+  /* Outer hex acts as the "border" color */
+  background: var(--hex-edge);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
 }
 
-/* Gradient fill layer */
+/* Inner fill — inset creates visible gap = border thickness */
 .hex::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: 2px;
   z-index: 0;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   background: linear-gradient(165deg, var(--hex-empty) 0%, var(--hex-fill) 100%);
@@ -451,16 +453,9 @@ button.hex {
   transition: background 0.2s ease;
 }
 
-/* Inner border layer */
+/* No longer needed — border is created by the gap between outer bg and inner ::before */
 .hex::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  z-index: 0;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  border: 1.5px solid var(--hex-edge);
-  opacity: 1;
-  pointer-events: none;
+  display: none;
 }
 
 .hex.empty:hover::before {
@@ -470,7 +465,8 @@ button.hex {
 .hex:hover {
   transform: scale(1.06);
   z-index: 10;
-  filter: drop-shadow(0 0 1px var(--accent)) drop-shadow(0 2px 8px var(--accent-glow));
+  background: var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent-glow));
 }
 
 .hex:focus {

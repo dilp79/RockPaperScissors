@@ -264,7 +264,36 @@
     }
 
     function onComputerTurnEnd() {
-      // no-op — engine sets status
+      // Force-sync DOM with engine state to fix any desync from clearing animations
+      syncBoard();
+    }
+
+    function syncBoard() {
+      var board = GameEngine.getBoard();
+      var size = GameEngine.getGridSize();
+      for (var r = 0; r < size; r++) {
+        for (var c = 0; c < size; c++) {
+          var hex = hexGrid.querySelector('.hex[data-row="' + r + '"][data-col="' + c + '"]');
+          if (!hex) continue;
+          var engineItem = board[r][c];
+          var hasImg = hex.querySelector('img');
+
+          if (engineItem && !hasImg) {
+            // Engine says occupied but DOM is empty — fix it
+            hex.classList.remove('empty', 'is-clearing');
+            var img = document.createElement('img');
+            img.src = engineItem + '.png';
+            img.alt = I18n.t(engineItem);
+            hex.innerHTML = '';
+            hex.appendChild(img);
+          } else if (!engineItem && hasImg) {
+            // Engine says empty but DOM has content — fix it
+            hex.innerHTML = '';
+            hex.classList.remove('is-clearing', 'pop-in', 'hex-ripple');
+            hex.classList.add('empty');
+          }
+        }
+      }
     }
 
     function onGameOver(data) {
