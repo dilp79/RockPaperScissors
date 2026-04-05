@@ -65,11 +65,11 @@
   --accent-dim: rgba(196, 168, 116, 0.15);
   --accent-glow: rgba(196, 168, 116, 0.3);
 
-  --hex-empty: #efe4cf;
-  --hex-fill: #f8f0e0;
+  --hex-empty: #f5ead6;
+  --hex-fill: #f5ead6;
   --hex-edge: rgba(196, 168, 116, 0.4);
   --hex-border: rgba(100, 80, 50, 0.7);
-  --hex-hover: #e8dcc4;
+  --hex-hover: #ede0c8;
 
   --particle-primary: #c4a874;
   --particle-secondary: #8b6914;
