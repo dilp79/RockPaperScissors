@@ -28,7 +28,7 @@
 
   --hex-empty: #1e1250;
   --hex-fill: #160e3a;
-  --hex-edge: rgba(0, 255, 255, 0.25);
+  --hex-edge: rgba(255, 255, 255, 0.18);
   --hex-hover: #2a1a70;
 
   --particle-primary: #00ffff;
@@ -98,7 +98,7 @@
 
   --hex-empty: #1e3348;
   --hex-fill: #18293a;
-  --hex-edge: rgba(102, 192, 244, 0.3);
+  --hex-edge: rgba(255, 255, 255, 0.15);
   --hex-hover: #2c4a65;
 
   --particle-primary: #66c0f4;
@@ -130,7 +130,7 @@
 
   --hex-empty: #201535;
   --hex-fill: #180f28;
-  --hex-edge: rgba(255, 77, 109, 0.25);
+  --hex-edge: rgba(255, 255, 255, 0.18);
   --hex-hover: #2d1a45;
 
   --particle-primary: #ff4d6d;
