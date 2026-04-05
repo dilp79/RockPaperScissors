@@ -252,8 +252,7 @@
   // Expose on window
   // ---------------------------------------------------------------------------
 
-  window.Audio = window.Audio || {};
-  window.Audio = {
+  window.GameAudio = {
     play: play,
     setMuted: setMuted,
     isMuted: isMuted,

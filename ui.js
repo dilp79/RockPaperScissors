@@ -98,7 +98,7 @@
         el.classList.add('has-selection');
       });
       statusText.textContent = I18n.t('selected_item', { item: I18n.t(item) });
-      Audio.play('select');
+      GameAudio.play('select');
     }
 
     function clearSelection() {
@@ -146,7 +146,7 @@
     // -------------------------------------------------------------------------
     function onHexClick(row, col) {
       if (!selectedItem || GameEngine.isBusy() || GameEngine.isGameOver()) return;
-      Audio.ensureContext();
+      GameAudio.ensureContext();
       GameEngine.playerMove(row, col, selectedItem).then(function (ok) {
         if (ok) clearSelection();
       });
@@ -189,19 +189,25 @@
       hex.innerHTML = '';
       hex.appendChild(img);
       retriggerClass(hex, 'pop-in');
-      retriggerClass(hex, 'ripple');
-      Audio.play('place');
+      retriggerClass(hex, 'hex-ripple');
+      GameAudio.play('place');
     }
 
     function onPiecesCleared(cells) {
-      Audio.play('capture');
+      GameAudio.play('capture');
       retriggerClass(boardWrapper, 'shake');
+      boardWrapper.addEventListener('animationend', function handler() {
+        boardWrapper.classList.remove('shake');
+        boardWrapper.removeEventListener('animationend', handler);
+      });
 
       var centers = [];
       cells.forEach(function (cell) {
         var hex = hexGrid.querySelector('.hex[data-row="' + cell.row + '"][data-col="' + cell.col + '"]');
         if (hex) {
           hex.classList.add('is-clearing');
+          var img = hex.querySelector('img');
+          if (img) img.classList.add('piece-vanish');
           setTimeout(function () {
             hex.innerHTML = '';
             hex.classList.remove('is-clearing');
@@ -220,7 +226,7 @@
       }
 
       if (cells.length >= 3) {
-        Audio.play('combo');
+        GameAudio.play('combo');
         Particles.flash();
         var midX = 0, midY = 0;
         centers.forEach(function (c) { midX += c.x; midY += c.y; });
@@ -255,14 +261,14 @@
     }
 
     function onGameOver(data) {
-      Audio.play('gameover');
+      GameAudio.play('gameover');
       goPlaced.textContent = data.stats.totalPlaced;
       goCleared.textContent = data.stats.totalCleared;
       goTurns.textContent = data.stats.turnsPlayed;
 
       if (data.isNewRecord) {
         goNewRecord.style.display = '';
-        setTimeout(function () { Audio.play('newrecord'); }, 600);
+        setTimeout(function () { GameAudio.play('newrecord'); }, 600);
       } else {
         goNewRecord.style.display = 'none';
       }
@@ -291,8 +297,8 @@
     // Title screen flow
     // -------------------------------------------------------------------------
     function onPlayClick() {
-      Audio.ensureContext();
-      Audio.play('ui_click');
+      GameAudio.ensureContext();
+      GameAudio.play('ui_click');
       hideOverlay(titleScreen);
 
       var tutorialDone = false;
@@ -340,14 +346,14 @@
     // Mute toggle
     // -------------------------------------------------------------------------
     function updateMuteButtons() {
-      var icon = Audio.isMuted() ? '\u{1F507}' : '\u{1F50A}';
+      var icon = GameAudio.isMuted() ? '\u{1F507}' : '\u{1F50A}';
       muteBtn.textContent = icon;
       mobileMuteBtn.textContent = icon;
     }
 
     function onMuteClick() {
-      Audio.ensureContext();
-      Audio.toggleMute();
+      GameAudio.ensureContext();
+      GameAudio.toggleMute();
       updateMuteButtons();
     }
 
@@ -418,7 +424,7 @@
     // Play Again
     // -------------------------------------------------------------------------
     function onPlayAgain() {
-      Audio.play('ui_click');
+      GameAudio.play('ui_click');
       hideOverlay(gameOverOverlay);
       buildGrid();
       Particles.clear();
@@ -436,7 +442,7 @@
     I18n.init();
 
     // 3. Audio
-    Audio.init();
+    GameAudio.init();
 
     // 4. Particles
     Particles.init(particleCanvas);

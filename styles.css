@@ -254,6 +254,7 @@ body {
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 6px;
+  padding: 0 16px;
 }
 
 .stat-label {
@@ -321,6 +322,10 @@ body {
 .item-btn:focus-visible {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.has-selection .item-btn:not(.selected) {
+  opacity: 0.5;
 }
 
 /* Settings */
