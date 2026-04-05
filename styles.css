@@ -913,10 +913,17 @@ button.hex {
   }
 
   .main-area {
-    padding-top: 54px;
-    padding-bottom: 74px;
-    align-items: flex-start;
-    overflow-y: auto;
+    padding-top: 48px;
+    padding-bottom: 68px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .board-wrapper {
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 120px);
+    overflow: auto;
   }
 
   /* Mobile top bar */
@@ -967,58 +974,39 @@ button.hex {
     overflow-x: auto;
   }
 
-  .mobile-item-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
+  .mobile-bottom-bar .item-btn {
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 12px;
+    font-size: 0;
     flex-shrink: 0;
-    border-radius: 10px;
-    border: 2px solid transparent;
-    background: var(--surface-elevated);
-    cursor: pointer;
-    transition: border-color 0.2s ease;
+    min-width: 56px;
   }
 
-  .mobile-item-btn img {
+  .mobile-bottom-bar .item-btn img {
     width: 32px;
     height: 32px;
-    object-fit: contain;
   }
 
-  .mobile-item-btn.selected {
-    border-color: var(--accent);
-    background: var(--accent-dim);
+  .mobile-bottom-bar .item-btn span {
+    font-size: 0.65rem;
   }
 
-  .mobile-hamburger {
+  .hamburger-btn {
     margin-left: auto;
     flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 8px;
     background: none;
-    border: none;
+    border: 1px solid var(--hex-edge);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 1.3rem;
+    padding: 6px 10px;
     cursor: pointer;
-  }
-
-  .mobile-hamburger span {
-    display: block;
-    width: 20px;
-    height: 2px;
-    background: var(--text-muted);
-    border-radius: 1px;
-    transition: background 0.2s ease;
-  }
-
-  .mobile-hamburger:hover span {
-    background: var(--text);
   }
 
   /* Mobile slide-up panel */
   .mobile-panel {
+    display: none;
     position: fixed;
     bottom: 64px;
     left: 0;
@@ -1028,20 +1016,14 @@ button.hex {
     border-radius: 16px 16px 0 0;
     padding: 20px 16px;
     z-index: 30;
-    transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     max-height: 60vh;
     overflow-y: auto;
   }
 
   .mobile-panel.open {
-    transform: translateY(0);
+    display: block;
   }
 
-  .board-wrapper {
-    border-radius: 12px;
-    padding: clamp(10px, 2vw, 16px);
-  }
 }
 
 /* Desktop hides mobile bars */
