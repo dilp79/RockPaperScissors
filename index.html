@@ -1,82 +1,215 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Пошаговая камень-ножницы-бумага на шестиугольном поле против компьютера.">
-    <meta name="theme-color" content="#1a1f2e">
-    <title>Камень-Ножницы-Бумага: Шестиугольная Стратегия</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Turn-based Rock Paper Scissors on a hexagonal board.">
+  <meta name="theme-color" content="#0a0a2e">
+  <title>Rock Paper Scissors: Hexagonal Strategy</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
+<body data-theme="neon">
 
-<body>
-    <div class="game-container">
-        <header class="header">
-            <h1>Камень-Ножницы-Бумага: Шестиугольная Стратегия</h1>
-            <p class="subtitle">Поле 10×10 · ход компьютера, затем ваш</p>
-            <p class="game-rules">Снимать с поля могут только ваши фигуры (зелёная обводка): сосед, который проигрывает
-                вашей фигуре, убирается, если рядом нет того, кто бьёт вас.</p>
-            <div class="score-container">
-                <p>Счёт: <span id="score">0</span></p>
-                <p class="best-score">Рекорд: <span id="bestScore">0</span></p>
-                <p class="difficulty">Сложность: <span id="difficulty">Лёгкая (3 фигуры)</span></p>
-            </div>
-        </header>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo" data-i18n="title">Rock Paper Scissors</div>
 
-        <main class="game-area">
-            <div class="hexagon-board">
-                <div class="hexagon-grid" id="hexGrid" role="region" aria-label="Игровое поле"></div>
-            </div>
-
-            <section class="controls" aria-labelledby="your-move-heading">
-                <h2 id="your-move-heading">Ваш ход</h2>
-                <p class="hint-keys" aria-hidden="true">Клавиши <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> — выбор фигуры,
-                    <kbd>Esc</kbd> — отмена</p>
-                <div class="item-selection" role="group" aria-label="Выбор фигуры">
-                    <button type="button" class="item" data-item="stone" aria-pressed="false">
-                        <img src="stone.png" alt="">
-                        <span>Камень</span>
-                    </button>
-                    <button type="button" class="item" data-item="scissors" aria-pressed="false">
-                        <img src="scissors.png" alt="">
-                        <span>Ножницы</span>
-                    </button>
-                    <button type="button" class="item" data-item="paper" aria-pressed="false">
-                        <img src="paper.png" alt="">
-                        <span>Бумага</span>
-                    </button>
-                </div>
-                <div class="status" id="gameStatus" role="status" aria-live="polite">Выберите фигуру и клетку на поле
-                </div>
-            </section>
-        </main>
+    <div class="stat-row">
+      <span data-i18n="score">Score</span>
+      <span id="scoreValue" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span data-i18n="best_score">Best</span>
+      <span id="bestScoreValue" class="stat-value best">0</span>
     </div>
 
-    <!-- Стартовый экран -->
-    <div class="message-overlay" id="startGameMessage" role="dialog" aria-modal="true" aria-labelledby="start-title">
-        <div class="message-box">
-            <h2 id="start-title">Камень-Ножницы-Бумага</h2>
-            <p class="start-lead">Шестиугольное поле, динамическая сложность, счёт за снятые фигуры.</p>
-            <button type="button" id="startButton">Начать игру</button>
+    <div id="difficultyBadge" class="difficulty-badge"></div>
+
+    <div id="itemPicker" class="item-picker">
+      <button class="item-btn" data-item="stone">
+        <img src="stone.png" alt="">
+        <span data-i18n="stone">Rock</span>
+      </button>
+      <button class="item-btn" data-item="scissors">
+        <img src="scissors.png" alt="">
+        <span data-i18n="scissors">Scissors</span>
+      </button>
+      <button class="item-btn" data-item="paper">
+        <img src="paper.png" alt="">
+        <span data-i18n="paper">Paper</span>
+      </button>
+    </div>
+
+    <div id="statusText" class="status-text" data-i18n="your_turn">Your turn</div>
+
+    <div class="sidebar-bottom">
+      <div class="settings-row">
+        <span data-i18n="mute">Sound</span>
+        <button id="muteBtn" class="toggle-btn">&#128264;</button>
+      </div>
+      <div class="settings-row">
+        <span data-i18n="language">Language</span>
+        <button id="langBtn" class="toggle-btn">EN</button>
+      </div>
+      <div class="settings-row">
+        <span data-i18n="skins">Theme</span>
+        <div id="skinDots" class="skin-dots">
+          <span class="skin-dot active" data-skin="neon"></span>
+          <span class="skin-dot" data-skin="elegant"></span>
+          <span class="skin-dot" data-skin="modern"></span>
+          <span class="skin-dot" data-skin="fantasy"></span>
         </div>
+      </div>
     </div>
+  </aside>
 
-    <!-- Экран окончания игры -->
-    <div class="message-overlay" id="endGameMessage" role="dialog" aria-modal="true" aria-labelledby="end-title"
-        aria-hidden="true">
-        <div class="message-box">
-            <h2 id="end-title">Игра окончена</h2>
-            <p>Ваш счёт: <span id="finalScore">0</span></p>
-            <p class="end-best">Рекорд: <span id="bestScoreFinal">0</span></p>
-            <button type="button" id="restartButton">Играть снова</button>
+  <!-- MAIN AREA -->
+  <main class="main-area">
+    <div id="boardWrapper" class="board-wrapper">
+      <div id="hexGrid" class="hex-grid"></div>
+      <canvas id="particleCanvas"></canvas>
+    </div>
+  </main>
+
+  <!-- MOBILE TOP BAR -->
+  <div class="mobile-top-bar" id="mobileTopBar">
+    <span data-i18n="title" style="font-size:0.85rem">Rock Paper Scissors</span>
+    <span id="mobileScore" class="stat-value" style="font-size:1rem">0</span>
+  </div>
+
+  <!-- MOBILE BOTTOM BAR -->
+  <div class="mobile-bottom-bar" id="mobileBottomBar">
+    <button class="item-btn" data-item="stone">
+      <img src="stone.png" alt="">
+      <span data-i18n="stone">Rock</span>
+    </button>
+    <button class="item-btn" data-item="scissors">
+      <img src="scissors.png" alt="">
+      <span data-i18n="scissors">Scissors</span>
+    </button>
+    <button class="item-btn" data-item="paper">
+      <img src="paper.png" alt="">
+      <span data-i18n="paper">Paper</span>
+    </button>
+    <button id="hamburgerBtn" class="hamburger-btn">&#9776;</button>
+  </div>
+
+  <!-- MOBILE PANEL -->
+  <div class="mobile-panel" id="mobilePanel">
+    <div class="stat-row">
+      <span data-i18n="score">Score</span>
+      <span id="mobilePanelScore" class="stat-value">0</span>
+    </div>
+    <div class="stat-row">
+      <span data-i18n="best_score">Best</span>
+      <span id="mobilePanelBest" class="stat-value best">0</span>
+    </div>
+    <div class="settings-row">
+      <span data-i18n="mute">Sound</span>
+      <button id="mobileMuteBtn" class="toggle-btn">&#128264;</button>
+    </div>
+    <div class="settings-row">
+      <span data-i18n="language">Language</span>
+      <button id="mobileLangBtn" class="toggle-btn">EN</button>
+    </div>
+    <div class="settings-row">
+      <span data-i18n="skins">Theme</span>
+      <div id="mobileSkinDots" class="skin-dots">
+        <span class="skin-dot active" data-skin="neon"></span>
+        <span class="skin-dot" data-skin="elegant"></span>
+        <span class="skin-dot" data-skin="modern"></span>
+        <span class="skin-dot" data-skin="fantasy"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TITLE SCREEN -->
+  <div class="overlay title-screen visible" id="titleScreen">
+    <div class="title-bg-hexes">
+      <div class="float-hex"></div>
+      <div class="float-hex"></div>
+      <div class="float-hex"></div>
+      <div class="float-hex"></div>
+    </div>
+    <div class="overlay-box title-content">
+      <h1 data-i18n="title">Rock Paper Scissors</h1>
+      <p data-i18n="subtitle">Hexagonal Strategy</p>
+      <div id="titleSkinDots" class="skin-dots">
+        <span class="skin-dot active" data-skin="neon"></span>
+        <span class="skin-dot" data-skin="elegant"></span>
+        <span class="skin-dot" data-skin="modern"></span>
+        <span class="skin-dot" data-skin="fantasy"></span>
+      </div>
+      <button id="titleLangBtn" class="toggle-btn">EN</button>
+      <button id="playBtn" class="btn-primary" data-i18n="play">Play</button>
+    </div>
+  </div>
+
+  <!-- TUTORIAL -->
+  <div class="overlay tutorial-overlay" id="tutorialOverlay">
+    <div class="overlay-box">
+      <div class="tutorial-step active" data-step="0">
+        <h3 data-i18n="tutorial_step1_title">How to Play</h3>
+        <p data-i18n="tutorial_step1">Place your piece on any empty hex. Rock beats Scissors, Scissors beats Paper, Paper beats Rock.</p>
+        <div>✊✌️🖐️</div>
+      </div>
+      <div class="tutorial-step" data-step="1">
+        <h3 data-i18n="tutorial_step2_title">The Board</h3>
+        <p data-i18n="tutorial_step2">The game is played on a hexagonal grid. Each piece can interact with its neighbors.</p>
+        <div>⬡</div>
+      </div>
+      <div class="tutorial-step" data-step="2">
+        <h3 data-i18n="tutorial_step3_title">Battles</h3>
+        <p data-i18n="tutorial_step3">When your piece beats an adjacent enemy piece and is not threatened, the enemy is cleared. Score points for each capture!</p>
+        <div>✊❌✌️</div>
+      </div>
+      <div class="tutorial-dots">
+        <span class="active"></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="tutorial-nav">
+        <button id="tutorialSkipBtn" class="btn-secondary" data-i18n="skip">Skip</button>
+        <button id="tutorialNextBtn" class="btn-primary" data-i18n="next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="overlay" id="gameOverOverlay">
+    <div class="overlay-box">
+      <h2 data-i18n="game_over">Game Over</h2>
+      <div id="goScore" class="score-countup">0</div>
+      <div id="goNewRecord" class="new-record-flash" data-i18n="new_record" style="display:none">New Record!</div>
+      <div class="gameover-stats">
+        <div class="gameover-stat">
+          <span id="goPlaced" class="gameover-stat-value">0</span>
+          <span data-i18n="pieces_placed">Pieces Placed</span>
         </div>
+        <div class="gameover-stat">
+          <span id="goCleared" class="gameover-stat-value">0</span>
+          <span data-i18n="pieces_cleared">Pieces Cleared</span>
+        </div>
+        <div class="gameover-stat">
+          <span id="goTurns" class="gameover-stat-value">0</span>
+          <span data-i18n="turns_survived">Turns Survived</span>
+        </div>
+      </div>
+      <div id="goSkinDots" class="skin-dots">
+        <span class="skin-dot active" data-skin="neon"></span>
+        <span class="skin-dot" data-skin="elegant"></span>
+        <span class="skin-dot" data-skin="modern"></span>
+        <span class="skin-dot" data-skin="fantasy"></span>
+      </div>
+      <button id="playAgainBtn" class="btn-primary" data-i18n="play_again">Play Again</button>
     </div>
+  </div>
 
-    <audio id="buttonClickSound" src="button_click.mp3"></audio>
-    <audio id="victorySound" src="victory.mp3"></audio>
-
-    <script src="script.js"></script>
+  <!-- Scripts -->
+  <script src="i18n.js"></script>
+  <script src="audio.js"></script>
+  <script src="particles.js"></script>
+  <script src="script.js"></script>
+  <script src="ui.js"></script>
 </body>
-
 </html>
