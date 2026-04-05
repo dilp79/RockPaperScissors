@@ -206,7 +206,7 @@
         const diff = getDifficulty();
         emit('onComputerTurnStart');
         emit('onDifficultyChanged', diff.label, diff.count);
-        emit('onStatusChanged', 'computer_placing', { count: diff.count });
+        emit('onStatusChanged', 'computer_places', { n: diff.count });
 
         const itemsToPlace = diff.count;
         let itemsPlaced = 0;
@@ -243,7 +243,7 @@
         if (isBoardFull()) {
             endGame();
         } else {
-            emit('onStatusChanged', 'choose_piece');
+            emit('onStatusChanged', 'your_turn');
         }
 
         emit('onComputerTurnEnd');
@@ -336,7 +336,7 @@
 
             await computerTurn();
 
-            emit('onStatusChanged', 'choose_piece');
+            emit('onStatusChanged', 'your_turn');
             return true;
         } finally {
             turnBusy = false;
