@@ -7,8 +7,8 @@
 
   // Remote backend config — set these to enable cloud leaderboard
   // For jsonbin.io: set BIN_ID and API_KEY
-  var BIN_ID = '';  // e.g. '665f...'
-  var API_KEY = ''; // e.g. '$2a$10$...'
+  var BIN_ID = '69d29f60856a68218900ad41';
+  var API_KEY = '$2a$10$QIi6H5ZwUYMJWwG3Q5mk5e1a2rqHgPrro7u26SnGtXcX7Ji5OKQuW';
 
   function getLocal() {
     try {
