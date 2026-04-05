@@ -123,21 +123,54 @@
     // -------------------------------------------------------------------------
     function buildGrid() {
       hexGrid.innerHTML = '';
+
+      // Measure hex size from CSS variables
+      var style = getComputedStyle(document.documentElement);
+      var temp = document.createElement('div');
+      temp.className = 'hex';
+      temp.style.position = 'absolute';
+      temp.style.visibility = 'hidden';
+      hexGrid.appendChild(temp);
+      var hexW = temp.offsetWidth;
+      var hexH = temp.offsetHeight;
+      hexGrid.removeChild(temp);
+
+      // Pointy-top hex math
+      var stepX = hexW + 1;             // horizontal spacing (hex width + small gap)
+      var stepY = hexH * 0.75;          // vertical spacing (75% of hex height)
+      var offsetX = stepX * 0.5;        // even-row horizontal shift (half step)
+
+      // Total grid dimensions
+      var totalW = GRID_SIZE * stepX + offsetX;
+      var totalH = (GRID_SIZE - 1) * stepY + hexH;
+
+      hexGrid.style.position = 'relative';
+      hexGrid.style.width = totalW + 'px';
+      hexGrid.style.height = totalH + 'px';
+
       for (var r = 0; r < GRID_SIZE; r++) {
-        var row = document.createElement('div');
-        row.className = 'hex-row';
         for (var c = 0; c < GRID_SIZE; c++) {
           var btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'hex empty';
           btn.dataset.row = r;
           btn.dataset.col = c;
+
+          // Position by hex formula
+          var x = c * stepX + (r % 2 === 1 ? offsetX : 0);
+          var y = r * stepY;
+
+          btn.style.position = 'absolute';
+          btn.style.left = x + 'px';
+          btn.style.top = y + 'px';
+          btn.style.width = hexW + 'px';
+          btn.style.height = hexH + 'px';
+
           btn.addEventListener('click', (function (rr, cc) {
             return function () { onHexClick(rr, cc); };
           })(r, c));
-          row.appendChild(btn);
+          hexGrid.appendChild(btn);
         }
-        hexGrid.appendChild(row);
       }
     }
 
@@ -182,6 +215,9 @@
       var hex = hexGrid.querySelector('.hex[data-row="' + row + '"][data-col="' + col + '"]');
       if (!hex) return;
       hex.classList.remove('empty');
+      if (isPlayer) {
+        hex.classList.add('player-cell');
+      }
       var img = document.createElement('img');
       img.src = item + '.png';
       img.alt = I18n.t(item);
@@ -208,10 +244,17 @@
           hex.classList.add('is-clearing');
           var img = hex.querySelector('img');
           if (img) img.classList.add('piece-vanish');
+          var snapshot = img;
           setTimeout(function () {
-            hex.innerHTML = '';
-            hex.classList.remove('is-clearing');
-            hex.classList.add('empty');
+            // Only wipe if the cell wasn't re-populated during the animation
+            if (hex.querySelector('img') === snapshot) {
+              hex.innerHTML = '';
+              hex.classList.remove('is-clearing', 'player-cell');
+              hex.classList.add('empty');
+            } else {
+              // Cell was re-populated; just remove the clearing flag
+              hex.classList.remove('is-clearing');
+            }
           }, 420);
         }
         var center = getHexCenter(cell.row, cell.col);
@@ -257,7 +300,36 @@
     }
 
     function onComputerTurnEnd() {
-      // no-op — engine sets status
+      // Force-sync DOM with engine state to fix any desync from clearing animations
+      syncBoard();
+    }
+
+    function syncBoard() {
+      var board = GameEngine.getBoard();
+      var size = GameEngine.getGridSize();
+      for (var r = 0; r < size; r++) {
+        for (var c = 0; c < size; c++) {
+          var hex = hexGrid.querySelector('.hex[data-row="' + r + '"][data-col="' + c + '"]');
+          if (!hex) continue;
+          var engineItem = board[r][c];
+          var hasImg = hex.querySelector('img');
+
+          if (engineItem && !hasImg) {
+            // Engine says occupied but DOM is empty — fix it
+            hex.classList.remove('empty', 'is-clearing');
+            var img = document.createElement('img');
+            img.src = engineItem + '.png';
+            img.alt = I18n.t(engineItem);
+            hex.innerHTML = '';
+            hex.appendChild(img);
+          } else if (!engineItem && hasImg) {
+            // Engine says empty but DOM has content — fix it
+            hex.innerHTML = '';
+            hex.classList.remove('is-clearing', 'pop-in', 'hex-ripple', 'player-cell');
+            hex.classList.add('empty');
+          }
+        }
+      }
     }
 
     function onGameOver(data) {

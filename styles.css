@@ -28,7 +28,8 @@
 
   --hex-empty: #1e1250;
   --hex-fill: #160e3a;
-  --hex-edge: rgba(0, 255, 255, 0.25);
+  --hex-edge: rgba(255, 255, 255, 0.18);
+  --hex-border: rgba(255, 255, 255, 0.35);
   --hex-hover: #2a1a70;
 
   --particle-primary: #00ffff;
@@ -67,6 +68,7 @@
   --hex-empty: #efe4cf;
   --hex-fill: #f8f0e0;
   --hex-edge: rgba(196, 168, 116, 0.4);
+  --hex-border: rgba(100, 80, 50, 0.7);
   --hex-hover: #e8dcc4;
 
   --particle-primary: #c4a874;
@@ -98,7 +100,8 @@
 
   --hex-empty: #1e3348;
   --hex-fill: #18293a;
-  --hex-edge: rgba(102, 192, 244, 0.3);
+  --hex-edge: rgba(255, 255, 255, 0.15);
+  --hex-border: rgba(255, 255, 255, 0.45);
   --hex-hover: #2c4a65;
 
   --particle-primary: #66c0f4;
@@ -130,7 +133,8 @@
 
   --hex-empty: #201535;
   --hex-fill: #180f28;
-  --hex-edge: rgba(255, 77, 109, 0.25);
+  --hex-edge: rgba(255, 255, 255, 0.18);
+  --hex-border: rgba(255, 255, 255, 0.45);
   --hex-hover: #2d1a45;
 
   --particle-primary: #ff4d6d;
@@ -391,27 +395,9 @@ kbd {
   --row-shift: calc(var(--hex-w) * 0.51);
 }
 
-.hex-grid,
-.hexagon-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.hex-grid {
   position: relative;
   z-index: 1;
-  padding: 4px 2px;
-}
-
-.hex-row,
-.hexagon-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: var(--row-overlap);
-  height: var(--hex-h);
-}
-
-.hex-row:nth-child(even),
-.hexagon-row:nth-child(even) {
-  margin-left: var(--row-shift);
 }
 
 button.hex {
@@ -428,7 +414,7 @@ button.hex {
   width: var(--hex-w);
   height: var(--hex-h);
   position: relative;
-  margin: 0 1px;
+  margin: 0;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
@@ -436,10 +422,17 @@ button.hex {
   justify-content: center;
   align-items: center;
   isolation: isolate;
-  filter: drop-shadow(0 0 0.5px var(--hex-edge)) drop-shadow(0 0.5px 0 rgba(0, 0, 0, 0.4));
+  background: linear-gradient(165deg, var(--hex-empty) 0%, var(--hex-fill) 100%);
+  /* drop-shadow renders OUTSIDE clip-path — this IS the visible border */
+  filter:
+    drop-shadow(0 0 0 var(--hex-border))
+    drop-shadow(1px 0 0 var(--hex-border))
+    drop-shadow(-1px 0 0 var(--hex-border))
+    drop-shadow(0 1px 0 var(--hex-border))
+    drop-shadow(0 -1px 0 var(--hex-border));
 }
 
-/* Gradient fill layer */
+/* Fill layer */
 .hex::before {
   content: '';
   position: absolute;
@@ -451,16 +444,8 @@ button.hex {
   transition: background 0.2s ease;
 }
 
-/* Inner border layer */
 .hex::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  z-index: 0;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  border: 1px solid var(--hex-edge);
-  opacity: 0.85;
-  pointer-events: none;
+  display: none;
 }
 
 .hex.empty:hover::before {
@@ -470,7 +455,13 @@ button.hex {
 .hex:hover {
   transform: scale(1.06);
   z-index: 10;
-  filter: drop-shadow(0 0 1px var(--accent)) drop-shadow(0 2px 8px var(--accent-glow));
+  filter:
+    drop-shadow(0 0 0 var(--accent))
+    drop-shadow(1px 0 0 var(--accent))
+    drop-shadow(-1px 0 0 var(--accent))
+    drop-shadow(0 1px 0 var(--accent))
+    drop-shadow(0 -1px 0 var(--accent))
+    drop-shadow(0 0 6px var(--accent-glow));
 }
 
 .hex:focus {
@@ -485,21 +476,22 @@ button.hex {
 .hex img.player {
   position: relative;
   z-index: 1;
-  width: 70%;
-  height: 70%;
+  width: 58%;
+  height: 58%;
   object-fit: contain;
   pointer-events: none;
-  filter: drop-shadow(0 0 6px var(--accent-glow));
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-  border-radius: 50%;
+}
+
+/* Player cell — highlighted background */
+.hex.player-cell::before {
+  background: linear-gradient(165deg, var(--accent-dim) 0%, var(--hex-fill) 100%) !important;
 }
 
 .hex img:not(.player) {
   position: relative;
   z-index: 1;
-  width: 72%;
-  height: 72%;
+  width: 58%;
+  height: 58%;
   object-fit: contain;
   pointer-events: none;
 }
@@ -1068,13 +1060,14 @@ button.hex {
 /* Sidebar */
 .sidebar-logo {
   font-family: var(--heading-font);
-  font-size: 1.05rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--accent);
   text-shadow: 0 0 10px var(--accent-glow);
   padding: 16px 16px 12px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   line-height: 1.3;
+  white-space: nowrap;
 }
 
 .sidebar-label {
@@ -1103,7 +1096,7 @@ button.hex {
 .difficulty-badge {
   display: inline-block;
   padding: 4px 12px;
-  margin: 0 16px;
+  margin: 0 16px 14px;
   border-radius: 12px;
   font-size: 0.78rem;
   font-weight: 600;
