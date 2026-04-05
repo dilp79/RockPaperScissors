@@ -29,6 +29,7 @@
   --hex-empty: #1e1250;
   --hex-fill: #160e3a;
   --hex-edge: rgba(255, 255, 255, 0.18);
+  --hex-border: rgba(255, 255, 255, 0.45);
   --hex-hover: #2a1a70;
 
   --particle-primary: #00ffff;
@@ -67,6 +68,7 @@
   --hex-empty: #efe4cf;
   --hex-fill: #f8f0e0;
   --hex-edge: rgba(196, 168, 116, 0.4);
+  --hex-border: rgba(0, 0, 0, 0.2);
   --hex-hover: #e8dcc4;
 
   --particle-primary: #c4a874;
@@ -99,6 +101,7 @@
   --hex-empty: #1e3348;
   --hex-fill: #18293a;
   --hex-edge: rgba(255, 255, 255, 0.15);
+  --hex-border: rgba(255, 255, 255, 0.45);
   --hex-hover: #2c4a65;
 
   --particle-primary: #66c0f4;
@@ -131,6 +134,7 @@
   --hex-empty: #201535;
   --hex-fill: #180f28;
   --hex-edge: rgba(255, 255, 255, 0.18);
+  --hex-border: rgba(255, 255, 255, 0.45);
   --hex-hover: #2d1a45;
 
   --particle-primary: #ff4d6d;
@@ -437,7 +441,7 @@ button.hex {
   align-items: center;
   isolation: isolate;
   /* Outer hex acts as the "border" color */
-  background: var(--hex-edge);
+  background: var(--hex-border);
   filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
 }
 
