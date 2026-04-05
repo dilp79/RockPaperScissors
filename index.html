@@ -4,62 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Пошаговая камень-ножницы-бумага на шестиугольном поле против компьютера.">
+    <meta name="theme-color" content="#1a1f2e">
     <title>Камень-Ножницы-Бумага: Шестиугольная Стратегия</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <div class="game-container">
-        <div class="header">
+        <header class="header">
             <h1>Камень-Ножницы-Бумага: Шестиугольная Стратегия</h1>
-            <p>Поле 10x10</p>
-            <p class="game-rules">Только ваши предметы (с зеленой подсветкой) могут инициировать удаление других
-                предметов</p>
+            <p class="subtitle">Поле 10×10 · ход компьютера, затем ваш</p>
+            <p class="game-rules">Снимать с поля могут только ваши фигуры (зелёная обводка): сосед, который проигрывает
+                вашей фигуре, убирается, если рядом нет того, кто бьёт вас.</p>
             <div class="score-container">
                 <p>Счёт: <span id="score">0</span></p>
-                <p class="difficulty">Сложность: <span id="difficulty">Легкая (3 предмета)</span></p>
+                <p class="best-score">Рекорд: <span id="bestScore">0</span></p>
+                <p class="difficulty">Сложность: <span id="difficulty">Лёгкая (3 фигуры)</span></p>
             </div>
-        </div>
+        </header>
 
-        <div class="game-area">
-            <div class="hexagon-grid" id="hexGrid"></div>
+        <main class="game-area">
+            <div class="hexagon-board">
+                <div class="hexagon-grid" id="hexGrid" role="region" aria-label="Игровое поле"></div>
+            </div>
 
-            <div class="controls">
-                <h2>Ваш ход</h2>
-                <div class="item-selection">
-                    <div class="item" data-item="stone">
-                        <img src="stone.png" alt="Камень">
-                        <p>Камень</p>
-                    </div>
-                    <div class="item" data-item="scissors">
-                        <img src="scissors.png" alt="Ножницы">
-                        <p>Ножницы</p>
-                    </div>
-                    <div class="item" data-item="paper">
-                        <img src="paper.png" alt="Бумага">
-                        <p>Бумага</p>
-                    </div>
+            <section class="controls" aria-labelledby="your-move-heading">
+                <h2 id="your-move-heading">Ваш ход</h2>
+                <p class="hint-keys" aria-hidden="true">Клавиши <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> — выбор фигуры,
+                    <kbd>Esc</kbd> — отмена</p>
+                <div class="item-selection" role="group" aria-label="Выбор фигуры">
+                    <button type="button" class="item" data-item="stone" aria-pressed="false">
+                        <img src="stone.png" alt="">
+                        <span>Камень</span>
+                    </button>
+                    <button type="button" class="item" data-item="scissors" aria-pressed="false">
+                        <img src="scissors.png" alt="">
+                        <span>Ножницы</span>
+                    </button>
+                    <button type="button" class="item" data-item="paper" aria-pressed="false">
+                        <img src="paper.png" alt="">
+                        <span>Бумага</span>
+                    </button>
                 </div>
-                <div class="status" id="gameStatus">Выберите предмет и разместите его на поле</div>
-            </div>
-        </div>
+                <div class="status" id="gameStatus" role="status" aria-live="polite">Выберите фигуру и клетку на поле
+                </div>
+            </section>
+        </main>
     </div>
 
     <!-- Стартовый экран -->
-    <div class="message-overlay" id="startGameMessage">
+    <div class="message-overlay" id="startGameMessage" role="dialog" aria-modal="true" aria-labelledby="start-title">
         <div class="message-box">
-            <h2>Добро пожаловать в игру!</h2>
-            <p>Камень-Ножницы-Бумага: Шестиугольная Стратегия</p>
-            <button id="startButton">Начать игру</button>
+            <h2 id="start-title">Камень-Ножницы-Бумага</h2>
+            <p class="start-lead">Шестиугольное поле, динамическая сложность, счёт за снятые фигуры.</p>
+            <button type="button" id="startButton">Начать игру</button>
         </div>
     </div>
 
     <!-- Экран окончания игры -->
-    <div class="message-overlay" id="endGameMessage">
+    <div class="message-overlay" id="endGameMessage" role="dialog" aria-modal="true" aria-labelledby="end-title"
+        aria-hidden="true">
         <div class="message-box">
-            <h2>Игра окончена!</h2>
-            <p>Ваш итоговый счёт: <span id="finalScore">0</span></p>
-            <button id="restartButton">Начать заново</button>
+            <h2 id="end-title">Игра окончена</h2>
+            <p>Ваш счёт: <span id="finalScore">0</span></p>
+            <p class="end-best">Рекорд: <span id="bestScoreFinal">0</span></p>
+            <button type="button" id="restartButton">Играть снова</button>
         </div>
     </div>
 

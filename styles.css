@@ -4,44 +4,96 @@
     box-sizing: border-box;
 }
 
+:root {
+    --bg: #0f1219;
+    --surface: #1a2230;
+    --surface-elevated: #232d3f;
+    --text: #e8ecf4;
+    --text-muted: #9aa8bc;
+    --accent: #5cdb95;
+    --accent-dim: rgba(92, 219, 149, 0.15);
+    --warning: #ffb86c;
+    --hex-empty: #2d3a52;
+    --hex-empty-inner: #243149;
+    --hex-edge: rgba(180, 198, 230, 0.45);
+    --hex-edge-strong: rgba(210, 225, 255, 0.65);
+    --hex-hover: #3d4f6e;
+    --field-bg: #121826;
+    --field-border: rgba(120, 150, 200, 0.35);
+    --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    --hex-w: clamp(36px, 8vw, 52px);
+    --hex-h: calc(var(--hex-w) * 1.15);
+    --row-overlap: calc(var(--hex-h) * -0.25);
+    --row-shift: calc(var(--hex-w) * 0.51);
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f0f0;
+    font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #1e2840 0%, var(--bg) 55%);
+    color: var(--text);
     display: flex;
     justify-content: center;
-    padding: 20px;
+    padding: clamp(12px, 3vw, 24px);
+    min-height: 100vh;
+    line-height: 1.45;
 }
 
 .game-container {
-    max-width: 1200px;
+    max-width: 1100px;
     width: 100%;
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background: var(--surface);
+    padding: clamp(16px, 3vw, 28px);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: clamp(16px, 3vw, 24px);
+}
+
+.header h1 {
+    font-size: clamp(1.15rem, 3.5vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-size: 0.95rem;
 }
 
 .game-rules {
-    color: #4CAF50;
-    font-weight: bold;
-    margin: 10px 0;
+    color: var(--accent);
+    font-weight: 600;
+    margin: 14px auto 0;
+    max-width: 52ch;
+    font-size: 0.92rem;
 }
 
 .score-container {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 10px;
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    font-weight: 700;
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    justify-content: center;
+    align-items: baseline;
+}
+
+.best-score {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
 }
 
 .difficulty {
-    font-size: 1rem;
-    color: #ff5722;
-    margin-top: 5px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--warning);
 }
 
 .game-area {
@@ -50,67 +102,161 @@ body {
     align-items: center;
 }
 
-/* Шестиугольная сетка */
+/* Рамка и фон игрового поля — сетка видна до первого хода */
+.hexagon-board {
+    background: var(--field-bg);
+    border: 1px solid var(--field-border);
+    border-radius: 12px;
+    padding: clamp(14px, 3vw, 22px);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 .hexagon-grid {
-    margin-bottom: 30px;
-    position: relative;
-    padding: 20px;
+    margin-bottom: 24px;
+    padding: 4px 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.hexagon-board .hexagon-grid {
+    margin-bottom: 0;
 }
 
 .hexagon-row {
     display: flex;
     justify-content: center;
-    margin-bottom: -15px;
-    /* Увеличиваем перекрытие рядов */
-    height: 55px;
-    /* Фиксированная высота ряда */
+    margin-bottom: var(--row-overlap);
+    height: var(--hex-h);
 }
 
 .hexagon-row:nth-child(even) {
-    margin-left: 26.5px;
-    /* Точный сдвиг для идеального выравнивания */
+    margin-left: var(--row-shift);
 }
 
+button.hexagon {
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    padding: 0;
+}
+
+/* Шестиугольник: заливка + «ободок» через псевдоэлемент с тем же clip-path */
 .hexagon {
-    width: 52px;
-    /* Немного увеличиваем ширину */
-    height: 60px;
-    /* Увеличиваем высоту для лучшего соотношения сторон */
-    background-color: #e0e0e0;
+    --hex-fill: var(--hex-empty-inner);
+    width: var(--hex-w);
+    height: var(--hex-h);
+    background-color: transparent;
     position: relative;
     margin: 0 1px;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
+    transition: transform 0.2s ease, filter 0.2s ease;
     display: flex;
     justify-content: center;
     align-items: center;
+    isolation: isolate;
+    filter:
+        drop-shadow(0 0 0.5px var(--hex-edge-strong))
+        drop-shadow(0 0.5px 0 rgba(0, 0, 0, 0.45));
+}
+
+.hexagon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: linear-gradient(165deg, var(--hex-empty) 0%, var(--hex-fill) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    pointer-events: none;
+}
+
+/* Внутренняя «грань» — тоньше обводка */
+.hexagon::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    z-index: 0;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    border: 1px solid var(--hex-edge);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+.hexagon.hexagon--empty:hover::before {
+    background: linear-gradient(165deg, var(--hex-hover) 0%, #2f3f58 100%);
 }
 
 .hexagon:hover {
-    background-color: #d0d0d0;
-    transform: scale(1.1);
+    transform: scale(1.06);
     z-index: 10;
+    filter:
+        drop-shadow(0 0 1px var(--hex-edge-strong))
+        drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.hexagon:focus {
+    outline: none;
+}
+
+.hexagon:focus-visible {
+    z-index: 12;
+    filter:
+        drop-shadow(0 0 0 2px var(--accent))
+        drop-shadow(0 0 8px rgba(92, 219, 149, 0.35));
 }
 
 .hexagon img {
+    position: relative;
+    z-index: 1;
     width: 80%;
     height: 80%;
     object-fit: contain;
     pointer-events: none;
 }
 
-/* Стиль для элементов игрока */
-.player-item {
-    border: 2px solid #4CAF50;
-    border-radius: 50%;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+.hexagon.is-clearing {
+    pointer-events: none;
 }
 
-/* Контроллы игры */
+.hexagon img.piece-vanish {
+    animation: pieceVanish 0.4s cubic-bezier(0.4, 0, 0.8, 0.45) forwards;
+    transform-origin: center center;
+}
+
+@keyframes pieceVanish {
+    0% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+        filter: blur(0);
+    }
+
+    55% {
+        opacity: 0.85;
+        transform: scale(0.88) rotate(-6deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.35) rotate(-14deg);
+        filter: blur(2px);
+    }
+}
+
+.player-item {
+    outline: 2px solid var(--accent);
+    outline-offset: -4px;
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(92, 219, 149, 0.35);
+}
+
 .controls {
     display: flex;
     flex-direction: column;
@@ -119,153 +265,220 @@ body {
     margin-top: 20px;
 }
 
+.controls h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.hint-keys {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 8px;
+}
+
+kbd {
+    font-family: ui-monospace, monospace;
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--surface-elevated);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 .item-selection {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-    margin: 20px 0;
+    gap: 12px;
+    margin: 18px 0 8px;
 }
 
-.item {
-    text-align: center;
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 10px;
+button.item {
+    -webkit-appearance: none;
+    appearance: none;
     border: 2px solid transparent;
-    transition: border-color 0.3s, transform 0.3s;
+    background: var(--surface-elevated);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: border-color 0.25s ease, transform 0.2s ease, background 0.2s ease;
+    min-width: 100px;
 }
 
-.item:hover {
-    border-color: #aaa;
-    transform: scale(1.05);
+button.item:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
 }
 
-.item.selected {
-    border-color: #4CAF50;
-    background-color: rgba(76, 175, 80, 0.1);
+button.item:focus {
+    outline: none;
+}
+
+button.item:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+button.item.selected {
+    border-color: var(--accent);
+    background: var(--accent-dim);
 }
 
 .item img {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
+    display: block;
+    margin: 0 auto 6px;
+}
+
+.item span {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 .status {
     text-align: center;
-    margin-top: 10px;
-    padding: 10px;
-    font-weight: bold;
-    height: 50px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    font-weight: 600;
+    min-height: 3em;
+    max-width: 40rem;
+    color: var(--text-muted);
 }
 
-/* Сообщение об окончании игры */
 .message-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
+    inset: 0;
+    background-color: rgba(8, 10, 16, 0.82);
+    backdrop-filter: blur(6px);
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 100;
-    display: none;
+    padding: 16px;
 }
 
 .message-box {
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    padding: clamp(24px, 5vw, 36px);
+    border-radius: 16px;
     text-align: center;
-    max-width: 400px;
+    max-width: 420px;
     width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow);
 }
 
 .message-box h2 {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
+    font-size: 1.4rem;
+}
+
+.start-lead {
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.end-best {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+#restartButton,
+#startButton {
+    margin-top: 20px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: 600;
+    transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 #restartButton {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background-color 0.3s;
+    background: linear-gradient(135deg, #3ecf8e, #2faa73);
+    color: #0a120e;
 }
 
 #restartButton:hover {
-    background-color: #45a049;
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+}
+
+#restartButton:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
 }
 
 #startButton {
-    margin-top: 20px;
-    padding: 15px 30px;
-    background-color: #2196F3;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: background-color 0.3s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #4f8cff, #3a6fd8);
+    color: #fff;
 }
 
 #startButton:hover {
-    background-color: #0b7dda;
-    transform: scale(1.05);
+    filter: brightness(1.08);
+    transform: translateY(-1px);
 }
 
-/* Анимации */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+#startButton:focus-visible {
+    outline: 3px solid #8eb8ff;
+    outline-offset: 2px;
 }
 
 @keyframes popIn {
     0% {
-        transform: scale(0);
+        transform: scale(0.6);
+        opacity: 0;
     }
 
     70% {
-        transform: scale(1.1);
+        transform: scale(1.06);
     }
 
     100% {
         transform: scale(1);
+        opacity: 1;
     }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s forwards;
 }
 
 .pop-in {
-    animation: popIn 0.3s forwards;
+    animation: popIn 0.28s ease forwards;
 }
 
-.removed {
-    animation: fadeOut 0.5s forwards;
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-        transform: scale(1);
+@media (max-width: 520px) {
+    .score-container {
+        flex-direction: column;
+        gap: 6px;
     }
 
-    to {
+    .hint-keys {
+        font-size: 0.8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hexagon img.piece-vanish {
+        animation: none;
         opacity: 0;
-        transform: scale(0);
+        transform: scale(0.92);
+    }
+
+    .pop-in {
+        animation: none;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
     }
 }
