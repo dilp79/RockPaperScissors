@@ -208,10 +208,17 @@
           hex.classList.add('is-clearing');
           var img = hex.querySelector('img');
           if (img) img.classList.add('piece-vanish');
+          var snapshot = img;
           setTimeout(function () {
-            hex.innerHTML = '';
-            hex.classList.remove('is-clearing');
-            hex.classList.add('empty');
+            // Only wipe if the cell wasn't re-populated during the animation
+            if (hex.querySelector('img') === snapshot) {
+              hex.innerHTML = '';
+              hex.classList.remove('is-clearing');
+              hex.classList.add('empty');
+            } else {
+              // Cell was re-populated; just remove the clearing flag
+              hex.classList.remove('is-clearing');
+            }
           }, 420);
         }
         var center = getHexCenter(cell.row, cell.col);

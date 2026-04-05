@@ -436,7 +436,7 @@ button.hex {
   justify-content: center;
   align-items: center;
   isolation: isolate;
-  filter: drop-shadow(0 0 0.5px var(--hex-edge)) drop-shadow(0 0.5px 0 rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 0 1px var(--hex-edge)) drop-shadow(0 0.5px 0.5px rgba(0, 0, 0, 0.6));
 }
 
 /* Gradient fill layer */
@@ -458,8 +458,8 @@ button.hex {
   inset: 2px;
   z-index: 0;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  border: 1px solid var(--hex-edge);
-  opacity: 0.85;
+  border: 1.5px solid var(--hex-edge);
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -485,8 +485,8 @@ button.hex {
 .hex img.player {
   position: relative;
   z-index: 1;
-  width: 70%;
-  height: 70%;
+  width: 58%;
+  height: 58%;
   object-fit: contain;
   pointer-events: none;
   filter: drop-shadow(0 0 6px var(--accent-glow));
@@ -498,8 +498,8 @@ button.hex {
 .hex img:not(.player) {
   position: relative;
   z-index: 1;
-  width: 72%;
-  height: 72%;
+  width: 58%;
+  height: 58%;
   object-fit: contain;
   pointer-events: none;
 }
