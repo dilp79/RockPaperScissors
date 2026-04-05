@@ -395,7 +395,7 @@ kbd {
 .hexagon-grid {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   position: relative;
   z-index: 1;
   padding: 4px 2px;
@@ -404,14 +404,14 @@ kbd {
 .hex-row,
 .hexagon-row {
   display: flex;
-  justify-content: center;
   margin-bottom: var(--row-overlap);
   height: var(--hex-h);
+  padding-left: 0;
 }
 
 .hex-row:nth-child(even),
 .hexagon-row:nth-child(even) {
-  margin-left: var(--row-shift);
+  padding-left: var(--row-shift);
 }
 
 button.hex {
@@ -428,7 +428,7 @@ button.hex {
   width: var(--hex-w);
   height: var(--hex-h);
   position: relative;
-  margin: 0 1px;
+  margin: 0 0.5px;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
