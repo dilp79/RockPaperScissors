@@ -482,9 +482,9 @@ button.hex {
   pointer-events: none;
 }
 
-/* Player cell — highlighted background */
+/* Player cell — highlighted background (flat, lighter shade) */
 .hex.player-cell::before {
-  background: linear-gradient(165deg, var(--accent-dim) 0%, var(--hex-fill) 100%) !important;
+  background: var(--accent-dim) !important;
 }
 
 .hex img:not(.player) {
@@ -799,6 +799,107 @@ button.hex {
   color: var(--text-muted);
   font-size: 0.9rem;
   margin-top: 8px;
+}
+
+/* ============================================================
+   7b. LEADERBOARD & NAME INPUT
+   ============================================================ */
+.go-name-section {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.go-name-input {
+  padding: 8px 12px;
+  border: 1px solid var(--hex-edge);
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 160px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.go-name-input:focus {
+  border-color: var(--accent);
+}
+
+.go-name-input::placeholder {
+  color: var(--text-muted);
+}
+
+.go-submit-btn {
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+
+.leaderboard {
+  margin: 12px 0;
+}
+
+.leaderboard h3 {
+  font-family: var(--heading-font);
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.leaderboard-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--hex-edge);
+}
+
+.leaderboard-table tr:last-child td {
+  border-bottom: none;
+}
+
+.leaderboard-table .lb-rank {
+  width: 28px;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.leaderboard-table .lb-name {
+  text-align: left;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.leaderboard-table .lb-score {
+  text-align: right;
+  color: var(--accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.leaderboard-table .lb-date {
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.leaderboard-table .lb-highlight {
+  background: var(--accent-dim);
+}
+
+.lb-empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 8px;
 }
 
 /* ============================================================

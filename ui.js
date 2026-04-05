@@ -332,8 +332,11 @@
       }
     }
 
+    var lastGameScore = 0;
+
     function onGameOver(data) {
       GameAudio.play('gameover');
+      lastGameScore = data.score;
       goPlaced.textContent = data.stats.totalPlaced;
       goCleared.textContent = data.stats.totalCleared;
       goTurns.textContent = data.stats.turnsPlayed;
@@ -344,6 +347,18 @@
       } else {
         goNewRecord.style.display = 'none';
       }
+
+      // Reset name input
+      var goNameInput = document.getElementById('goNameInput');
+      var goNameSection = document.getElementById('goNameSection');
+      var goSubmitBtn = document.getElementById('goSubmitBtn');
+      goNameInput.value = '';
+      goNameSection.style.display = 'flex';
+      goSubmitBtn.disabled = false;
+      goSubmitBtn.textContent = I18n.t('submit');
+
+      // Load and show leaderboard
+      renderLeaderboard();
 
       showOverlay(gameOverOverlay);
 
@@ -363,6 +378,54 @@
         }
       }
       requestAnimationFrame(animateScore);
+    }
+
+    // -------------------------------------------------------------------------
+    // Leaderboard
+    // -------------------------------------------------------------------------
+    function renderLeaderboard(highlightName) {
+      Leaderboard.getScores().then(function (scores) {
+        var tbody = document.querySelector('#goLeaderboardTable tbody');
+        tbody.innerHTML = '';
+        if (scores.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="lb-empty">' + I18n.t('no_scores') + '</td></tr>';
+          return;
+        }
+        for (var i = 0; i < scores.length; i++) {
+          var s = scores[i];
+          var tr = document.createElement('tr');
+          if (highlightName && s.name === highlightName && s.score === lastGameScore) {
+            tr.className = 'lb-highlight';
+          }
+          tr.innerHTML = '<td class="lb-rank">' + (i + 1) + '</td>' +
+            '<td class="lb-name">' + escapeHtml(s.name) + '</td>' +
+            '<td class="lb-score">' + s.score + '</td>' +
+            '<td class="lb-date">' + s.date + '</td>';
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function onSubmitScore() {
+      var goNameInput = document.getElementById('goNameInput');
+      var goSubmitBtn = document.getElementById('goSubmitBtn');
+      var name = goNameInput.value.trim();
+      if (!name) {
+        goNameInput.focus();
+        return;
+      }
+      goSubmitBtn.disabled = true;
+      goSubmitBtn.textContent = '...';
+      Leaderboard.addScore(name, lastGameScore).then(function () {
+        document.getElementById('goNameSection').style.display = 'none';
+        renderLeaderboard(name);
+      });
     }
 
     // -------------------------------------------------------------------------
@@ -550,6 +613,10 @@
     playAgainBtn.addEventListener('click', onPlayAgain);
     tutorialNextBtn.addEventListener('click', onTutorialNext);
     tutorialSkipBtn.addEventListener('click', finishTutorial);
+    document.getElementById('goSubmitBtn').addEventListener('click', onSubmitScore);
+    document.getElementById('goNameInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') onSubmitScore();
+    });
     muteBtn.addEventListener('click', onMuteClick);
     mobileMuteBtn.addEventListener('click', onMuteClick);
     langBtn.addEventListener('click', onLangClick);
