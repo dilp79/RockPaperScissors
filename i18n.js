@@ -44,6 +44,10 @@
       skins: 'Theme',
       figures_word: 'pieces',
       computer_places: 'Computer places {n} pieces...',
+      leaderboard: 'Leaderboard',
+      enter_name: 'Your name',
+      submit: 'Submit',
+      no_scores: 'No scores yet',
     },
 
     ru: {
@@ -86,6 +90,10 @@
       skins: 'Тема',
       figures_word: 'фигур',
       computer_places: 'Компьютер ставит {n} фигур...',
+      leaderboard: 'Таблица лидеров',
+      enter_name: 'Ваше имя',
+      submit: 'Отправить',
+      no_scores: 'Пока нет результатов',
     },
   };
 
@@ -127,6 +135,11 @@
     for (var i = 0; i < elements.length; i++) {
       var el = elements[i];
       el.textContent = t(el.dataset.i18n);
+    }
+    var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+    for (var j = 0; j < placeholders.length; j++) {
+      var el2 = placeholders[j];
+      el2.placeholder = t(el2.dataset.i18nPlaceholder);
     }
   }
 

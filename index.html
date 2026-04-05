@@ -195,6 +195,20 @@
           <span data-i18n="turns_survived">Turns Survived</span>
         </div>
       </div>
+      <!-- Name input -->
+      <div id="goNameSection" class="go-name-section">
+        <input type="text" id="goNameInput" class="go-name-input" maxlength="20" placeholder="Your name" data-i18n-placeholder="enter_name">
+        <button id="goSubmitBtn" class="btn-secondary go-submit-btn" data-i18n="submit">Submit</button>
+      </div>
+
+      <!-- Leaderboard -->
+      <div id="goLeaderboard" class="leaderboard">
+        <h3 data-i18n="leaderboard">Leaderboard</h3>
+        <table id="goLeaderboardTable" class="leaderboard-table">
+          <tbody></tbody>
+        </table>
+      </div>
+
       <div id="goSkinDots" class="skin-dots">
         <span class="skin-dot active" data-skin="neon"></span>
         <span class="skin-dot" data-skin="elegant"></span>
@@ -210,6 +224,7 @@
   <script src="audio.js"></script>
   <script src="particles.js"></script>
   <script src="script.js"></script>
+  <script src="leaderboard.js"></script>
   <script src="ui.js"></script>
 </body>
 </html>
