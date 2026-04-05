@@ -395,27 +395,9 @@ kbd {
   --row-shift: calc(var(--hex-w) * 0.51);
 }
 
-.hex-grid,
-.hexagon-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.hex-grid {
   position: relative;
   z-index: 1;
-  padding: 4px;
-}
-
-.hex-row,
-.hexagon-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: var(--row-overlap);
-  height: var(--hex-h);
-}
-
-.hex-row:nth-child(even),
-.hexagon-row:nth-child(even) {
-  transform: translateX(calc(var(--hex-w) / 2 + 1.5px));
 }
 
 button.hex {
@@ -432,7 +414,7 @@ button.hex {
   width: var(--hex-w);
   height: var(--hex-h);
   position: relative;
-  margin: 0 1.5px;
+  margin: 0;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
