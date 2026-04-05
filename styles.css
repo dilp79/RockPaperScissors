@@ -68,7 +68,7 @@
   --hex-empty: #efe4cf;
   --hex-fill: #f8f0e0;
   --hex-edge: rgba(196, 168, 116, 0.4);
-  --hex-border: rgba(180, 150, 90, 0.5);
+  --hex-border: rgba(196, 168, 116, 0.4);
   --hex-hover: #e8dcc4;
 
   --particle-primary: #c4a874;
@@ -399,23 +399,23 @@ kbd {
 .hexagon-grid {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   position: relative;
   z-index: 1;
-  padding: 4px 2px;
+  padding: 4px;
 }
 
 .hex-row,
 .hexagon-row {
   display: flex;
+  justify-content: center;
   margin-bottom: var(--row-overlap);
   height: var(--hex-h);
-  padding-left: 0;
 }
 
 .hex-row:nth-child(even),
 .hexagon-row:nth-child(even) {
-  padding-left: var(--row-shift);
+  transform: translateX(calc(var(--hex-w) / 2 + 1.5px));
 }
 
 button.hex {
