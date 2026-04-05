@@ -1099,7 +1099,7 @@ button.hex {
 .difficulty-badge {
   display: inline-block;
   padding: 4px 12px;
-  margin: 0 16px;
+  margin: 0 16px 14px;
   border-radius: 12px;
   font-size: 0.78rem;
   font-weight: 600;
