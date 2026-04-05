@@ -381,6 +381,7 @@
         updateTutorialStep();
         showOverlay(tutorialOverlay);
       } else {
+        requestAnimationFrame(function () { Particles.resize(); });
         GameEngine.startGame();
       }
     }
@@ -402,6 +403,8 @@
     function finishTutorial() {
       hideOverlay(tutorialOverlay);
       try { localStorage.setItem(TUTORIAL_KEY, 'true'); } catch (_) {}
+      // Resize particles now that board is fully visible
+      requestAnimationFrame(function () { Particles.resize(); });
       GameEngine.startGame();
     }
 
@@ -521,6 +524,11 @@
 
     // 5. Build grid
     buildGrid();
+
+    // 5b. Resize particles canvas after grid is laid out
+    requestAnimationFrame(function () {
+      Particles.resize();
+    });
 
     // 6. Engine callbacks
     GameEngine.setCallbacks({
