@@ -1,32 +1,28 @@
-# Камень-Ножницы-Бумага: Шестиугольная Стратегия
+# Rock Paper Scissors: Hexagonal Strategy
 
-Пошаговая игра на шестиугольном поле **10×10**, где игрок соревнуется с компьютером, размещая фигуры «камень», «ножницы» и «бумага».
+Turn-based strategy game on a 10x10 hexagonal grid. Place rock, scissors, or paper — capture enemies by beating adjacent pieces without a counter nearby.
 
-## Правила игры
+## How to Play
 
-1. Поле — шестиугольная сетка 10×10. Сначала ходит компьютер, затем вы.
-2. Ход компьютера: случайные фигуры в случайные свободные клетки (базово 3 за ход; сложность растёт с вашим счётом).
-3. Ход игрока: выбрать одну из карточек (камень, ножницы или бумага) и разместить её на свободной клетке поля.
-4. После каждого хода происходит проверка поля и удаление элементов по следующим правилам:
-   - Если в клетке находится камень, в соседних клетках нет бумаги, но есть ножницы, то ножницы удаляются
-   - Если в клетке находится бумага, в соседних клетках нет ножниц, но есть камень, то камень удаляется
-   - Если в клетке находятся ножницы, в соседних клетках нет камня, но есть бумага, то бумага удаляется
-5. За каждую очищенную клетку игрок получает 1 очко.
-6. Игра заканчивается, когда на поле не остаётся свободных клеток.
+1. Computer places pieces, then it's your turn
+2. Pick a weapon (rock / scissors / paper) and place it on an empty hex
+3. Your piece captures adjacent losers — but only if no counter is nearby
+4. Score 1 point per captured piece. Difficulty scales with your score
+5. Game ends when the board is full
 
-## Запуск
+## Features
 
-- **Веб:** откройте `index.html` в браузере (или опубликуйте через GitHub Pages). Рекорд хранится в `localStorage`.
-- **Pygame (опционально):** `pip install -r requirements.txt`, затем `python game.py` — упрощённый прототип на квадратной сетке.
+- 4 switchable visual themes (Neon Arcade, Elegant, Modern Gaming, Dark Fantasy)
+- Bilingual: English / Russian
+- Animated title screen, 3-step tutorial, game over with stats
+- Canvas particle effects, chain lightning, combo text
+- Web Audio API synthesized sounds
+- Mobile responsive with bottom bar layout
 
-## Технические детали
+## Run
 
-Игра разработана с использованием:
-- HTML5
-- CSS3 (включая шестиугольную сетку и анимации)
-- JavaScript (ES6+)
+Open `index.html` in a browser. No build tools needed.
 
-## Звуковые эффекты
+## Tech
 
-- При размещении предмета воспроизводится звук "button_click.mp3"
-- При удалении предметов с поля воспроизводится звук "victory.mp3" 
+Vanilla HTML5 + CSS3 + ES6 JavaScript. No frameworks.
