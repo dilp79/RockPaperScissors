@@ -122,6 +122,64 @@
         return getEmptyCells().length === 0;
     }
 
+    function getCellPreview(row, col, item) {
+        if (
+            row < 0 || row >= GRID_SIZE ||
+            col < 0 || col >= GRID_SIZE ||
+            !ITEMS.includes(item)
+        ) {
+            return null;
+        }
+
+        const occupied = gameBoard[row][col] !== null;
+        const neighbors = getNeighbors(row, col);
+        const captures = [];
+        const threats = [];
+        const threatItems = [];
+        const seenThreatItems = new Set();
+
+        for (const n of neighbors) {
+            const nItem = gameBoard[n.row][n.col];
+            if (!nItem) continue;
+
+            if (beats(item, nItem)) {
+                captures.push({ row: n.row, col: n.col, item: nItem });
+            }
+
+            if (beats(nItem, item)) {
+                threats.push({ row: n.row, col: n.col, item: nItem });
+                if (!seenThreatItems.has(nItem)) {
+                    seenThreatItems.add(nItem);
+                    threatItems.push(nItem);
+                }
+            }
+        }
+
+        const safeCaptures = threats.length === 0 ? captures : [];
+        let statusKey = 'no_capture';
+        let statusParams = {};
+
+        if (safeCaptures.length > 0) {
+            statusKey = 'safe_capture';
+            statusParams = { n: safeCaptures.length };
+        } else if (threatItems.length > 0) {
+            statusKey = 'blocked_by';
+            statusParams = { item: threatItems[0] };
+        }
+
+        return {
+            row,
+            col,
+            item,
+            occupied,
+            captures: safeCaptures,
+            threats,
+            gain: safeCaptures.length,
+            statusKey,
+            statusParams
+        };
+    }
+
     // ---------------------------------------------------------------------------
     // Place a piece (internal — no DOM)
     // ---------------------------------------------------------------------------
@@ -147,24 +205,11 @@
             const currentItem = gameBoard[row][col];
             if (!currentItem) continue;
 
-            const neighbors = getNeighbors(row, col);
-            let hasWin = false;
-            let hasLoss = false;
+            const preview = getCellPreview(row, col, currentItem);
+            if (!preview) continue;
 
-            for (const n of neighbors) {
-                const nItem = gameBoard[n.row][n.col];
-                if (!nItem) continue;
-                if (beats(currentItem, nItem)) hasWin = true;
-                if (beats(nItem, currentItem)) hasLoss = true;
-            }
-
-            if (hasWin && !hasLoss) {
-                for (const n of neighbors) {
-                    const nItem = gameBoard[n.row][n.col];
-                    if (nItem && beats(currentItem, nItem)) {
-                        cellMap.set(`${n.row}-${n.col}`, n);
-                    }
-                }
+            for (const n of preview.captures) {
+                cellMap.set(`${n.row}-${n.col}`, { row: n.row, col: n.col });
             }
         }
 
@@ -367,6 +412,7 @@
         isGameOver,
         isBusy,
         getGridSize,
-        getNeighbors
+        getNeighbors,
+        getMovePreview: getCellPreview
     };
 }());

@@ -15,6 +15,7 @@
     const difficultyBadge   = document.getElementById('difficultyBadge');
     const itemPicker        = document.getElementById('itemPicker');
     const statusText        = document.getElementById('statusText');
+    const hintsBtn          = document.getElementById('hintsBtn');
     const muteBtn           = document.getElementById('muteBtn');
     const langBtn           = document.getElementById('langBtn');
     const skinDots          = document.getElementById('skinDots');
@@ -30,6 +31,7 @@
     const mobilePanel       = document.getElementById('mobilePanel');
     const mobilePanelScore  = document.getElementById('mobilePanelScore');
     const mobilePanelBest   = document.getElementById('mobilePanelBest');
+    const mobileHintsBtn    = document.getElementById('mobileHintsBtn');
     const mobileMuteBtn     = document.getElementById('mobileMuteBtn');
     const mobileLangBtn     = document.getElementById('mobileLangBtn');
     const mobileSkinDots    = document.getElementById('mobileSkinDots');
@@ -57,7 +59,12 @@
     // -------------------------------------------------------------------------
     let selectedItem  = null;
     let tutorialStep  = 0;
+    let previewState  = null;
+    let hintsEnabled  = false;
+    let lastPointerType = '';
+    let baseStatus    = { key: 'your_turn', params: null };
     const THEME_KEY   = 'scipaprock_theme';
+    const HINTS_KEY   = 'scipaprock_hints';
     const TUTORIAL_KEY = 'scipaprock_tutorial_done';
     const GRID_SIZE   = GameEngine.getGridSize();
 
@@ -86,6 +93,77 @@
       setTheme(dot.dataset.skin);
     }
 
+    function loadHintsEnabled() {
+      try {
+        return localStorage.getItem(HINTS_KEY) === '1';
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function saveHintsEnabled() {
+      try {
+        localStorage.setItem(HINTS_KEY, hintsEnabled ? '1' : '0');
+      } catch (_) {
+        /* ignore */
+      }
+    }
+
+    function getTranslatedParams(params) {
+      if (!params) return null;
+      var translated = Object.assign({}, params);
+      if (translated.item) {
+        translated.item = I18n.t(translated.item);
+      }
+      return translated;
+    }
+
+    function formatStatus(status) {
+      if (!status || !status.key) return '';
+      var text = I18n.t(status.key, getTranslatedParams(status.params));
+      if (status.key === 'computer_thinking') {
+        text += '...';
+      }
+      return text;
+    }
+
+    function renderStatus() {
+      var activeStatus = hintsEnabled && previewState
+        ? { key: previewState.statusKey, params: previewState.statusParams }
+        : baseStatus;
+      statusText.textContent = formatStatus(activeStatus);
+    }
+
+    function setBaseStatus(key, params) {
+      baseStatus = { key: key, params: params || null };
+      renderStatus();
+    }
+
+    function updateHintsButtons() {
+      var label = I18n.t(hintsEnabled ? 'on' : 'off');
+      [hintsBtn, mobileHintsBtn].forEach(function (btn) {
+        btn.textContent = label;
+        btn.classList.toggle('is-active', hintsEnabled);
+      });
+    }
+
+    function setHintsEnabled(nextValue) {
+      hintsEnabled = !!nextValue;
+      saveHintsEnabled();
+      updateHintsButtons();
+      if (!hintsEnabled) {
+        clearPreview();
+      } else {
+        renderStatus();
+      }
+    }
+
+    function onHintsClick() {
+      GameAudio.ensureContext();
+      GameAudio.play('ui_click');
+      setHintsEnabled(!hintsEnabled);
+    }
+
     // -------------------------------------------------------------------------
     // Item selection
     // -------------------------------------------------------------------------
@@ -97,7 +175,10 @@
       document.querySelectorAll('.item-picker, .mobile-bottom-bar').forEach(function (el) {
         el.classList.add('has-selection');
       });
-      statusText.textContent = I18n.t('selected_item', { item: I18n.t(item) });
+      setBaseStatus('selected_item', { item: item });
+      if (previewState) {
+        updatePreviewForCell(previewState.row, previewState.col);
+      }
       GameAudio.play('select');
     }
 
@@ -109,7 +190,8 @@
       document.querySelectorAll('.item-picker, .mobile-bottom-bar').forEach(function (el) {
         el.classList.remove('has-selection');
       });
-      statusText.textContent = I18n.t('your_turn');
+      clearPreview();
+      setBaseStatus('your_turn');
     }
 
     function handleItemBtnClick(e) {
@@ -166,6 +248,16 @@
           btn.style.width = hexW + 'px';
           btn.style.height = hexH + 'px';
 
+          btn.addEventListener('pointerdown', onHexPointerDown);
+          btn.addEventListener('pointerenter', (function (rr, cc) {
+            return function (event) { onHexPointerEnter(rr, cc, event); };
+          })(r, c));
+          btn.addEventListener('pointerleave', (function (rr, cc) {
+            return function (event) { onHexPointerLeave(rr, cc, event); };
+          })(r, c));
+          btn.addEventListener('focus', (function (rr, cc) {
+            return function () { updatePreviewForCell(rr, cc); };
+          })(r, c));
           btn.addEventListener('click', (function (rr, cc) {
             return function () { onHexClick(rr, cc); };
           })(r, c));
@@ -177,8 +269,50 @@
     // -------------------------------------------------------------------------
     // Hex click handler
     // -------------------------------------------------------------------------
+    function onHexPointerDown(event) {
+      lastPointerType = event.pointerType || '';
+    }
+
+    function onHexPointerEnter(row, col, event) {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      updatePreviewForCell(row, col);
+    }
+
+    function onHexPointerLeave(row, col, event) {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      if (previewState && previewState.row === row && previewState.col === col) {
+        clearPreview();
+      }
+    }
+
     function onHexClick(row, col) {
-      if (!selectedItem || GameEngine.isBusy() || GameEngine.isGameOver()) return;
+      var hex = getHex(row, col);
+      var isEmptyCell = !!hex && hex.classList.contains('empty');
+
+      if (!selectedItem) {
+        if (!GameEngine.isBusy() && !GameEngine.isGameOver() && isEmptyCell) {
+          setBaseStatus('pick_weapon');
+          pulsePickers();
+        }
+        return;
+      }
+
+      if (GameEngine.isBusy() || GameEngine.isGameOver()) return;
+
+      var preview = GameEngine.getMovePreview(row, col, selectedItem);
+      if (hintsEnabled && preview && !preview.occupied && (lastPointerType === 'touch' || lastPointerType === 'pen')) {
+        var samePreview = previewState &&
+          previewState.row === row &&
+          previewState.col === col &&
+          previewState.item === selectedItem;
+
+        if (!samePreview) {
+          applyPreview(preview);
+          return;
+        }
+      }
+
+      clearPreview();
       GameAudio.ensureContext();
       GameEngine.playerMove(row, col, selectedItem).then(function (ok) {
         if (ok) clearSelection();
@@ -188,8 +322,12 @@
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+    function getHex(row, col) {
+      return hexGrid.querySelector('.hex[data-row="' + row + '"][data-col="' + col + '"]');
+    }
+
     function getHexCenter(row, col) {
-      var hex = hexGrid.querySelector('.hex[data-row="' + row + '"][data-col="' + col + '"]');
+      var hex = getHex(row, col);
       if (!hex) return null;
       var hr = hex.getBoundingClientRect();
       var cr = particleCanvas.getBoundingClientRect();
@@ -200,6 +338,117 @@
       el.classList.remove(cls);
       void el.offsetWidth; // force reflow
       el.classList.add(cls);
+    }
+
+    function pulsePickers() {
+      document.querySelectorAll('.item-picker, .mobile-bottom-bar').forEach(function (el) {
+        retriggerClass(el, 'picker-pulse');
+        el.addEventListener('animationend', function handler() {
+          el.classList.remove('picker-pulse');
+          el.removeEventListener('animationend', handler);
+        });
+      });
+    }
+
+    function clearPreview() {
+      if (!previewState) {
+        renderStatus();
+        return;
+      }
+
+      var anchorHex = getHex(previewState.row, previewState.col);
+      if (anchorHex) {
+        anchorHex.classList.remove('preview-anchor', 'preview-has-gain');
+      }
+
+      if (previewState.ghostEl && previewState.ghostEl.parentNode) {
+        previewState.ghostEl.parentNode.removeChild(previewState.ghostEl);
+      }
+
+      if (previewState.gainEl && previewState.gainEl.parentNode) {
+        previewState.gainEl.parentNode.removeChild(previewState.gainEl);
+      }
+
+      previewState.captures.forEach(function (cell) {
+        var hex = getHex(cell.row, cell.col);
+        if (hex) hex.classList.remove('preview-capture');
+      });
+
+      previewState.threats.forEach(function (cell) {
+        var hex = getHex(cell.row, cell.col);
+        if (hex) hex.classList.remove('preview-threat');
+      });
+
+      previewState = null;
+      renderStatus();
+    }
+
+    function applyPreview(preview) {
+      if (!hintsEnabled || !selectedItem || !preview || preview.occupied) {
+        clearPreview();
+        return false;
+      }
+
+      clearPreview();
+
+      var anchorHex = getHex(preview.row, preview.col);
+      if (!anchorHex) return false;
+
+      var ghost = document.createElement('img');
+      ghost.src = preview.item + '.png';
+      ghost.alt = '';
+      ghost.className = 'preview-ghost';
+      ghost.setAttribute('aria-hidden', 'true');
+      anchorHex.appendChild(ghost);
+      anchorHex.classList.add('preview-anchor');
+
+      var gainEl = null;
+      if (preview.gain > 0) {
+        gainEl = document.createElement('span');
+        gainEl.className = 'preview-gain';
+        gainEl.textContent = '+' + preview.gain;
+        anchorHex.appendChild(gainEl);
+        anchorHex.classList.add('preview-has-gain');
+      }
+
+      preview.captures.forEach(function (cell) {
+        var hex = getHex(cell.row, cell.col);
+        if (hex) hex.classList.add('preview-capture');
+      });
+
+      preview.threats.forEach(function (cell) {
+        var hex = getHex(cell.row, cell.col);
+        if (hex) hex.classList.add('preview-threat');
+      });
+
+      previewState = {
+        row: preview.row,
+        col: preview.col,
+        item: preview.item,
+        captures: preview.captures.slice(),
+        threats: preview.threats.slice(),
+        ghostEl: ghost,
+        gainEl: gainEl,
+        statusKey: preview.statusKey,
+        statusParams: preview.statusParams || null
+      };
+      renderStatus();
+      return true;
+    }
+
+    function updatePreviewForCell(row, col) {
+      if (!hintsEnabled || !selectedItem || GameEngine.isBusy() || GameEngine.isGameOver()) {
+        clearPreview();
+        return false;
+      }
+
+      var preview = GameEngine.getMovePreview(row, col, selectedItem);
+      if (!preview || preview.occupied) {
+        clearPreview();
+        return false;
+      }
+
+      return applyPreview(preview);
     }
 
     // -------------------------------------------------------------------------
@@ -292,11 +541,12 @@
     }
 
     function onStatusChanged(key, params) {
-      statusText.textContent = I18n.t(key, params);
+      setBaseStatus(key, params);
     }
 
     function onComputerTurnStart() {
-      statusText.textContent = I18n.t('computer_thinking') + '...';
+      clearPreview();
+      setBaseStatus('computer_thinking');
     }
 
     function onComputerTurnEnd() {
@@ -312,7 +562,7 @@
           var hex = hexGrid.querySelector('.hex[data-row="' + r + '"][data-col="' + c + '"]');
           if (!hex) continue;
           var engineItem = board[r][c];
-          var hasImg = hex.querySelector('img');
+          var hasImg = hex.querySelector('img:not(.preview-ghost)');
 
           if (engineItem && !hasImg) {
             // Engine says occupied but DOM is empty — fix it
@@ -510,12 +760,8 @@
       I18n.setLang(next);
       I18n.applyLang();
       updateLangButtons();
-      // Re-apply dynamic status text
-      if (selectedItem) {
-        statusText.textContent = I18n.t('selected_item', { item: I18n.t(selectedItem) });
-      } else if (!GameEngine.isBusy() && !GameEngine.isGameOver()) {
-        statusText.textContent = I18n.t('your_turn');
-      }
+      updateHintsButtons();
+      renderStatus();
       // Update difficulty badge
       var score = GameEngine.getScore();
       if (score >= 60) {
@@ -564,7 +810,9 @@
     function onPlayAgain() {
       GameAudio.play('ui_click');
       hideOverlay(gameOverOverlay);
+      clearPreview();
       buildGrid();
+      clearSelection();
       Particles.clear();
       GameEngine.startGame();
     }
@@ -575,6 +823,7 @@
 
     // 1. Theme
     setTheme(loadTheme());
+    hintsEnabled = loadHintsEnabled();
 
     // 2. I18n
     I18n.init();
@@ -617,12 +866,19 @@
     document.getElementById('goNameInput').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') onSubmitScore();
     });
+    hintsBtn.addEventListener('click', onHintsClick);
+    mobileHintsBtn.addEventListener('click', onHintsClick);
     muteBtn.addEventListener('click', onMuteClick);
     mobileMuteBtn.addEventListener('click', onMuteClick);
     langBtn.addEventListener('click', onLangClick);
     titleLangBtn.addEventListener('click', onLangClick);
     mobileLangBtn.addEventListener('click', onLangClick);
     hamburgerBtn.addEventListener('click', onHamburgerClick);
+    hexGrid.addEventListener('mouseleave', function () {
+      if (lastPointerType !== 'touch' && lastPointerType !== 'pen') {
+        clearPreview();
+      }
+    });
     document.addEventListener('keydown', onKeyDown);
 
     // Skin dot click delegation
@@ -636,8 +892,10 @@
     mobileBottomBar.addEventListener('click', handleItemBtnClick);
 
     // 9. Update mute/lang button states
+    updateHintsButtons();
     updateMuteButtons();
     updateLangButtons();
+    renderStatus();
 
     // 10. Title screen is already visible via HTML class
 

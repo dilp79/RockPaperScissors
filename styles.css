@@ -34,6 +34,10 @@
 
   --particle-primary: #00ffff;
   --particle-secondary: #ff0066;
+  --hint-safe: #47f3a2;
+  --hint-safe-glow: rgba(71, 243, 162, 0.42);
+  --hint-danger: #ff6b7d;
+  --hint-danger-glow: rgba(255, 107, 125, 0.4);
 
   --btn-gradient: linear-gradient(135deg, #ff0066 0%, #cc0052 100%);
   --btn-text: #fff;
@@ -73,6 +77,10 @@
 
   --particle-primary: #c4a874;
   --particle-secondary: #8b6914;
+  --hint-safe: #2f996b;
+  --hint-safe-glow: rgba(47, 153, 107, 0.28);
+  --hint-danger: #c65b4f;
+  --hint-danger-glow: rgba(198, 91, 79, 0.26);
 
   --btn-gradient: linear-gradient(135deg, #c4a874 0%, #a88a50 100%);
   --btn-text: #fff;
@@ -106,6 +114,10 @@
 
   --particle-primary: #66c0f4;
   --particle-secondary: #4fa3d6;
+  --hint-safe: #6ee7b7;
+  --hint-safe-glow: rgba(110, 231, 183, 0.28);
+  --hint-danger: #ff7f7f;
+  --hint-danger-glow: rgba(255, 127, 127, 0.28);
 
   --btn-gradient: linear-gradient(135deg, #66c0f4 0%, #4fa3d6 100%);
   --btn-text: #0e1c28;
@@ -139,6 +151,10 @@
 
   --particle-primary: #ff4d6d;
   --particle-secondary: #ff8fa3;
+  --hint-safe: #73f7b5;
+  --hint-safe-glow: rgba(115, 247, 181, 0.34);
+  --hint-danger: #ff7a93;
+  --hint-danger-glow: rgba(255, 122, 147, 0.34);
 
   --btn-gradient: linear-gradient(135deg, #ff4d6d 0%, #cc3055 100%);
   --btn-text: #fff;
@@ -496,6 +512,82 @@ button.hex {
   pointer-events: none;
 }
 
+.hex .preview-ghost {
+  position: relative;
+  z-index: 1;
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
+  pointer-events: none;
+  opacity: 0.48;
+  transform: scale(0.94);
+  filter: saturate(0.9) brightness(1.08);
+}
+
+.hex.preview-anchor {
+  z-index: 11;
+  filter:
+    drop-shadow(0 0 0 var(--accent))
+    drop-shadow(1px 0 0 var(--accent))
+    drop-shadow(-1px 0 0 var(--accent))
+    drop-shadow(0 1px 0 var(--accent))
+    drop-shadow(0 -1px 0 var(--accent))
+    drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.hex.preview-anchor::before {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 28%, var(--hex-empty)) 0%, var(--hex-fill) 100%);
+}
+
+.hex.preview-capture {
+  z-index: 9;
+  filter:
+    drop-shadow(0 0 0 var(--hint-safe))
+    drop-shadow(1px 0 0 var(--hint-safe))
+    drop-shadow(-1px 0 0 var(--hint-safe))
+    drop-shadow(0 1px 0 var(--hint-safe))
+    drop-shadow(0 -1px 0 var(--hint-safe))
+    drop-shadow(0 0 10px var(--hint-safe-glow));
+}
+
+.hex.preview-capture::before {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--hint-safe) 24%, var(--hex-empty)) 0%, var(--hex-fill) 100%);
+}
+
+.hex.preview-threat {
+  z-index: 9;
+  filter:
+    drop-shadow(0 0 0 var(--hint-danger))
+    drop-shadow(1px 0 0 var(--hint-danger))
+    drop-shadow(-1px 0 0 var(--hint-danger))
+    drop-shadow(0 1px 0 var(--hint-danger))
+    drop-shadow(0 -1px 0 var(--hint-danger))
+    drop-shadow(0 0 10px var(--hint-danger-glow));
+}
+
+.hex.preview-threat::before {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--hint-danger) 20%, var(--hex-empty)) 0%, var(--hex-fill) 100%);
+}
+
+.preview-gain {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  z-index: 2;
+  min-width: 30px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(6, 16, 22, 0.88);
+  border: 1px solid var(--hint-safe);
+  color: var(--hint-safe);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  box-shadow: 0 0 12px var(--hint-safe-glow);
+  pointer-events: none;
+}
+
 .hex.is-clearing {
   pointer-events: none;
 }
@@ -586,6 +678,22 @@ button.hex {
     box-shadow: 0 0 0 0 var(--accent-glow);
   }
   50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+@keyframes pickerPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  35% {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 4px var(--accent-dim);
+  }
+  70% {
+    transform: translateY(0);
     box-shadow: 0 0 0 8px transparent;
   }
 }
@@ -1184,6 +1292,11 @@ button.hex {
   min-height: 2.4em;
 }
 
+.picker-pulse .item-btn,
+.picker-pulse {
+  animation: pickerPulse 380ms ease;
+}
+
 .difficulty-badge {
   display: inline-block;
   padding: 4px 12px;
@@ -1211,6 +1324,13 @@ button.hex {
 .toggle-btn:hover {
   border-color: var(--accent);
   background: var(--accent-dim);
+}
+
+.toggle-btn.is-active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-glow) inset;
 }
 
 /* Skin selector */

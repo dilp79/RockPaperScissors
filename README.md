@@ -2,6 +2,10 @@
 
 Turn-based strategy game on a 10x10 hexagonal grid. Place rock, scissors, or paper — capture enemies by beating adjacent pieces without a counter nearby.
 
+## Play Online
+
+https://dilp79.github.io/RockPaperScissors/
+
 ## How to Play
 
 1. Computer places pieces, then it's your turn
